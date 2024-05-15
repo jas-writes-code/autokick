@@ -51,7 +51,8 @@ async def updateList(message):
 
 @client.event
 async def on_message(message):
-    for element in message.author.roles:
+    member = message.guild.get_member(message.author.id)
+    for element in member.roles:
         if element.id == int(role):
             if message.channel == int(channel):
                 new_entry = {
