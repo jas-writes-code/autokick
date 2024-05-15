@@ -1,0 +1,13 @@
+{"cfg": {
+  "key": "BOT TOKEN HERE",
+  "server": "TARGET SERVER HERE",
+  "role": "TARGET ROLE HERE",
+  "channel": "TARGET CHANNEL HERE",
+  "log": "LOG CHANNEL HERE"
+},
+"messages": {
+  "0": {
+    "message": 100,
+    "time": 99
+  }
+}}
