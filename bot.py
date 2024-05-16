@@ -48,6 +48,9 @@ async def updateList(message, kick):
                     if allowance < time.time():
                             await server.kick(member)
                             await waiting.send(f'User <@{member.id}> was kicked as they failed to verify in time! <@{member.id}> joined <t:{int(join)}:R> and their latest message was <t:{latest}:R>.')
+                            del config["messages"][member.id]
+                            with open('config.json', 'w') as file:
+                                json.dump(config, file)
                     elif join + 172800 < time.time():
                         await member.guild.kick(member)
                         await waiting.send(f'User <@{member.id}> was kicked as they failed to verify in time! <@{member.id}> joined <t:{int(join)}:R> and has no tracked messages.')
