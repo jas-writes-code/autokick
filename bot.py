@@ -10,10 +10,10 @@ key = config["cfg"]["key"]
 server = config["cfg"]["server"]
 role = config["cfg"]["role"]
 channel = config["cfg"]["channel"]
-logChannel = int(config["cfg"]["log"])
+logChannel = config["cfg"]["log"]
 kicklist = []
 cooldown = 0
-reminder = f"Welcome <@&{role}>! This is your periodic reminder to follow the instructions in <#1189684060075855932> to see the rest of the server! If you fail to do so within 48 hours of joining, you will be kicked. \n \n *I am a bot, and this action was performed automatically. Beep Boop.*"
+reminder = f"Welcome <@&{role}>! This is your periodic reminder to follow the instructions in <#1189684060075855932> to see the rest of the server! If you fail to do so within 48 hours of joining, you will be kicked.\n*I'm a bot. Beep boop.*"
 
 @client.event
 async def on_ready():
@@ -35,7 +35,7 @@ async def checkMessages(user):
         else:
             return
 
-async def updateList(message, kick):
+async def updateList(kick):
     global cooldown
     await log.send("Checking member list. Members with Unverified role, who joined more than 48 hours ago, and have not sent a message in 24 hours, will be kicked.")
     for member in server.members:
@@ -46,14 +46,11 @@ async def updateList(message, kick):
                 if latest is not None and kick:
                     allowance = max(latest + 172800 / 2, join + 172800)
                     if allowance < time.time():
-                            await server.kick(member)
-                            await waiting.send(f'User <@{member.id}> was kicked as they failed to verify in time! <@{member.id}> joined <t:{int(join)}:R> and their latest message was <t:{latest}:R>.')
-                            del config["messages"][member.id]
-                            with open('config.json', 'w') as file:
-                                json.dump(config, file)
+                        await server.kick(member)
+                        await log.send(f'User <@{member.id}> was kicked as they failed to verify in time! <@{member.id}> joined <t:{int(join)}:R> and their latest message was <t:{latest}:R>.')
                     elif join + 172800 < time.time():
                         await member.guild.kick(member)
-                        await waiting.send(f'User <@{member.id}> was kicked as they failed to verify in time! <@{member.id}> joined <t:{int(join)}:R> and has no tracked messages.')
+                        await log.send(f'User <@{member.id}> was kicked as they failed to verify in time! <@{member.id}> joined <t:{int(join)}:R> and has no tracked messages.')
                 elif latest and not kick:
                     allowance = max(latest + 172800 / 2, join + 172800)
                     if allowance < time.time():
@@ -62,6 +59,8 @@ async def updateList(message, kick):
                     await log.send(f'User <@{member.id}> has been a member for **{int(int(time.time() - join) / 60 / 60)}** hours, has no tracked messages, and has failed to verify! No action was taken, as kicking is disabled in bot.py.')
     cooldown = 0
     await log.send(f"Check complete!")
+    if kick:
+        await waiting.send(reminder)
 
 @client.event
 async def on_message(message):
@@ -74,7 +73,7 @@ async def on_message(message):
                 if element.id == int(role):
                     new_entry = {
                         "message": message.id,
-                        "time": time.time()
+                        "time": int(time.time())
                     }
                     id = message.author.id
                     config["messages"][id] = new_entry
@@ -82,7 +81,7 @@ async def on_message(message):
                         json.dump(config, file)
                     break
         if cooldown > 1000:
-            await updateList(message, False) # set this to False if you don't want to kick people
+            await updateList(False) # set this to False if you don't want to kick people
 
 @client.event
 async def on_member_join(member):
@@ -94,5 +93,20 @@ async def on_member_join(member):
             await log.send(f"<@{member.id}> joined on a fresh account.\nUnderlap: **{int(overlap)}** minute(s)\nCreated <t:{create}:f>.")
         elif overlap < 1440:
             await log.send(f" <@{member.id}> joined on a fresh account.\nUnderlap: **{int(overlap / 60)}** hour(s) \nCreated <t:{create}:f>.")
+
+@client.event
+async def on_member_leave(member):
+    if member.id in config["messages"]:
+        del config["messages"][member.id]
+        with open('config.json', 'w') as file:
+            json.dump(config, file)
+
+@client.event
+async def on_member_update(before, after):
+    if before.roles != after.roles:
+        if not after.roles.count(role):
+            del config["messages"][after.id]
+            with open('config.json', 'w') as file:
+                json.dump(config, file)
 
 client.run(str(key))
