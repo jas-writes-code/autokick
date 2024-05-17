@@ -98,7 +98,6 @@ async def on_member_join(member):
 @client.event
 async def on_member_leave(member):
     if member.guild == server:
-        print("user left server!")
         if member.id in config["messages"]:
             del config["messages"][member.id]
             with open('config.json', 'w') as file:
@@ -110,7 +109,6 @@ async def on_member_update(before, after):
         if before.roles != after.roles:
             id = discord.Object(id=role)
             if id not in after.roles:
-                print("user was verified!")
                 if str(role) in config["messages"]:
                     del config["messages"][after.id]
                     with open('config.json', 'w') as file:
