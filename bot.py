@@ -1,3 +1,4 @@
+import discord
 from discord import *
 import re
 import time
@@ -78,7 +79,7 @@ async def on_message(message):
                     id = message.author.id
                     config["messages"][id] = new_entry
                     with open('config.json', 'w') as file:
-                        json.dump(config, file)
+                        json.dump(config, file, indent=4)
                     break
         if cooldown > 1000:
             await updateList(False) # set this to False if you don't want to kick people
@@ -90,23 +91,29 @@ async def on_member_join(member):
         create = member.created_at.timestamp()
         overlap = (join - create) / 60
         if overlap < 60:
-            await log.send(f"<@{member.id}> joined on a fresh account.\nUnderlap: **{int(overlap)}** minute(s)\nCreated <t:{create}:f>.")
+            await log.send(f"<@{member.id}> joined on a fresh account.\nUnderlap: **{int(overlap)}** minute(s)\nCreated <t:{int(create)}:f>.")
         elif overlap < 1440:
-            await log.send(f" <@{member.id}> joined on a fresh account.\nUnderlap: **{int(overlap / 60)}** hour(s) \nCreated <t:{create}:f>.")
+            await log.send(f" <@{member.id}> joined on a fresh account.\nUnderlap: **{int(overlap / 60)}** hour(s) \nCreated <t:{int(create)}:f>.")
 
 @client.event
 async def on_member_leave(member):
-    if member.id in config["messages"]:
-        del config["messages"][member.id]
-        with open('config.json', 'w') as file:
-            json.dump(config, file)
+    if member.guild == server:
+        print("user left server!")
+        if member.id in config["messages"]:
+            del config["messages"][member.id]
+            with open('config.json', 'w') as file:
+                json.dump(config, file, indent=4)
 
 @client.event
 async def on_member_update(before, after):
-    if before.roles != after.roles:
-        if not after.roles.count(role):
-            del config["messages"][after.id]
-            with open('config.json', 'w') as file:
-                json.dump(config, file)
+    if before.guild == server:
+        if before.roles != after.roles:
+            id = discord.Object(id=role)
+            if id not in after.roles:
+                print("user was verified!")
+                if str(role) in config["messages"]:
+                    del config["messages"][after.id]
+                    with open('config.json', 'w') as file:
+                        json.dump(config, file, indent=4)
 
 client.run(str(key))
