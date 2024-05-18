@@ -12,7 +12,6 @@ server = config["cfg"]["server"]
 role = config["cfg"]["role"]
 channel = config["cfg"]["channel"]
 logChannel = config["cfg"]["log"]
-kicklist = []
 cooldown = 1000
 reminder = f"Welcome <@&{role}>! This is your periodic reminder to follow the instructions in <#1189684060075855932> to see the rest of the server! If you fail to do so within 48 hours of joining, you will be kicked.\n*I'm a bot. Beep boop.*"
 
@@ -30,11 +29,10 @@ async def on_ready():
     print("The bot works -- this terminal will not provide further feedback unless there is an error. It's safe to detatch this window.")
 
 async def checkMessages(user):
-    for element in config["messages"]:
-        if element == user.id:
-            return element[1]
-        else:
-            return
+    for identifier, data in config["messages"].items():
+        if int(identifier) == user.id:
+            return data["time"]
+    return None
 
 async def updateList(kick):
     global cooldown
@@ -55,7 +53,7 @@ async def updateList(kick):
                 elif latest and not kick:
                     allowance = max(latest + 172800 / 2, join + 172800)
                     if allowance < time.time():
-                        await log.send(f'User <@{member.id}> has been a member for **{int(int(time.time() - join) / 60 / 60)}** hours, their last tracked message was **{int(int(time.time() - latest) / 60 / 60)}** hours ago, and has failed to verify! No action was taken, as kicking is disabled in bot.py.')
+                    await log.send(f'User <@{member.id}> has been a member for **{int(int(time.time() - join) / 60 / 60)}** hours, their last tracked message was **{int(int(time.time() - latest) / 60 / 60)}** hours ago, and has failed to verify! No action was taken, as kicking is disabled in bot.py.')
                 elif join + 172800 < time.time():
                     await log.send(f'User <@{member.id}> has been a member for **{int(int(time.time() - join) / 60 / 60)}** hours, has no tracked messages, and has failed to verify! No action was taken, as kicking is disabled in bot.py.')
     await log.send(f"Check complete!")
