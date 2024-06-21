@@ -1,5 +1,5 @@
-# equitybot
-Custom bot for the EP server.
+# autokick
+Custom bot that kicks users who fail to verify after a set period of time. 
 
 You'll need discord.py, obviously. Also fill in the info in config.json with the following details:
 
