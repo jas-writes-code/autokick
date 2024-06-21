@@ -3,7 +3,8 @@
   "server": "TARGET SERVER HERE",
   "role": "TARGET ROLE HERE",
   "channel": "TARGET CHANNEL HERE",
-  "log": "LOG CHANNEL HERE"
+  "log": "LOG CHANNEL HERE",
+  "notif": "NOTIF CHANNEL HERE"
 },
 "messages": {
   "0": {
