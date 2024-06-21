@@ -8,3 +8,4 @@ You'll need discord.py, obviously. Also fill in the info in config.json with the
 * `role`: The role your autorole gives to users who aren't verified.
 * `channel`: A channel where unverified users are allowed to send messages.
 * `log`: A channel where kick messages are sent.
+* `notif`: A channel where young account warnings are sent. This can be the same as the log channel.
