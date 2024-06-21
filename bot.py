@@ -90,9 +90,9 @@ async def on_member_join(member):
         create = member.created_at.timestamp()
         overlap = (join - create) / 60
         if overlap < 60:
-            await log.send(f"<@{member.id}> joined on a fresh account.\nUnderlap: **{int(overlap)}** minute(s)\nCreated <t:{create}:f>.")
+            await log.send(f"<@{member.id}> joined on a fresh account.\nUnderlap: **{int(overlap)}** minute(s)\nCreated <t:{int(create)}:f>.")
         elif overlap < 1440:
-            await log.send(f" <@{member.id}> joined on a fresh account.\nUnderlap: **{int(overlap / 60)}** hour(s) \nCreated <t:{create}:f>.")
+            await log.send(f"<@{member.id}> joined on a fresh account.\nUnderlap: **{int(overlap / 60)}** hour(s) \nCreated <t:{int(create)}:f>.")
 
 @client.event
 async def on_member_leave(member):
