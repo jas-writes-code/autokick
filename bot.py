@@ -71,17 +71,18 @@ async def on_message(message):
     if message.guild.id == server.id and message.author.id != 892286562606383156:
         cooldown += 1
         member = message.author
-        for element in member.roles:
-            if element.id == int(role):
-                new_entry = {
-                    "message": message.id,
-                    "time": int(time.time())
-                }
-                id = message.author.id
-                config["messages"][id] = new_entry
-                with open('config.json', 'w') as file:
-                    json.dump(config, file, indent=4)
-                break
+        if message.author.joined_at is not None:
+            for element in member.roles:
+                if element.id == int(role):
+                    new_entry = {
+                        "message": message.id,
+                        "time": int(time.time())
+                    }
+                    id = message.author.id
+                    config["messages"][id] = new_entry
+                    with open('config.json', 'w') as file:
+                        json.dump(config, file, indent=4)
+                    break
         if cooldown > 1000:
             cooldown = 0
             await updateList(False) # set this to False if you don't want to kick people
